@@ -1,7 +1,8 @@
 #pragma once
-#include <iostream>
 #include "NoElementError.hpp"
+#include <vector>
 #include <functional>
+#include <iostream>
 
 template <typename ValueType>
 class BST
@@ -16,7 +17,7 @@ class BST
     };
     Node* root_{};
     int size_{};
-    
+
     Node* findParent(Node* current, ValueType val) const;
     int countChildrenHeight(const Node* current) const;
     void postOrderTraversal(Node*, std::function<void(Node*)>);
@@ -27,7 +28,8 @@ class BST
     ~BST();
     void insert(ValueType val);
     void printNode(const Node* current) const;
-    const Node* findNode(ValueType val) const;
+    template <typename Value>
+    const Node* findNode(Value&& val) const;
     const Node* root() const;
     int getDepth(const Node* node) const;
     int getHeight() const;
@@ -45,33 +47,36 @@ bool BST<ValueType>::Node::isLeaf() const
     return (!right_child_ && !left_child_);
 }
 
-
 // Complexity: equal to findParent()
 template <typename ValueType>
 void BST<ValueType>::insert(ValueType val)
 {
     if (!root_) {
         root_ = new Node(val);
+        size_++;
         return;
     }
     Node* current = findParent(root_, val);
     if (val > current->value_) {
         current->right_child_ = new Node(val);
         current->right_child_->parent_ = current;
-    } else {
+        size_++;
+
+    } else if (val < current->value_) {
         current->left_child_ = new Node(val);
         current->left_child_->parent_ = current;
+        size_++;
     }
-    size_++;
 }
 
 // returns the parent of the potential node with value "val"
 // if there is already element with value "val" return the pointer to this element
-// Complexity: O(h) where h is the height of the tree 
+// Complexity: O(h) where h is the height of the tree
 // (which means O(logn) on average where n is the total number of elements in the tree)
 // Worst case scenario: O(n) where n is the total number of elements in the tree
 template <typename ValueType>
-typename BST<ValueType>::Node* BST<ValueType>::findParent(Node* current, ValueType val) const
+typename BST<ValueType>::Node* BST<ValueType>::findParent(Node* current,
+                                                          ValueType val) const
 {
     if (current->left_child_ && val < current->value_) {
         current = findParent(current->left_child_, val);
@@ -86,31 +91,36 @@ typename BST<ValueType>::Node* BST<ValueType>::findParent(Node* current, ValueTy
 template <typename ValueType>
 void BST<ValueType>::printNode(const BST<ValueType>::Node* current) const
 {
-    auto print = [](auto currentNode) {
-        std::cout << currentNode->value_ << ", ";
-    };
+    auto print = [](auto currentNode) { std::cout << currentNode->value_ << ", "; };
     constInOrderTraversal(current, print);
 }
 
 template <typename ValueType>
-const typename BST<ValueType>::Node* BST<ValueType>::root() const {
+const typename BST<ValueType>::Node* BST<ValueType>::root() const
+{
     return root_;
 }
 
 template <typename ValueType>
-const typename BST<ValueType>::Node* BST<ValueType>::findNode(ValueType val) const {
+template <typename Value>
+const typename BST<ValueType>::Node* BST<ValueType>::findNode(Value&& val) const
+{
+    if (!root_) {
+        throw NoElementError(std::forward<Value>(val));
+    }
     auto current = findParent(root_, val);
     if (current->value_ == val) {
         return current;
     }
-    throw NoElementError("there is no element with value: " + std::to_string(val));
+    throw NoElementError(std::forward<Value>(val));
 }
 
 // returns the depth of the chosen node, starting with 1 at the root node
 // Complexity: O(n) where n is the number of parents of the chosen node
 // In the worst case scenario n = total number of elements (unbalanced tree)
 template <typename ValueType>
-int BST<ValueType>::getDepth(const BST<ValueType>::Node* node) const {
+int BST<ValueType>::getDepth(const BST<ValueType>::Node* node) const
+{
     if (node == nullptr) {
         return 0;
     }
@@ -121,7 +131,8 @@ int BST<ValueType>::getDepth(const BST<ValueType>::Node* node) const {
 }
 
 template <typename ValueType>
-int BST<ValueType>::getHeight() const {
+int BST<ValueType>::getHeight() const
+{
     if (!root_) {
         return 0;
     }
@@ -129,7 +140,8 @@ int BST<ValueType>::getHeight() const {
 }
 
 template <typename ValueType>
-int BST<ValueType>::getSize() const {
+int BST<ValueType>::getSize() const
+{
     return size_;
 }
 
@@ -138,7 +150,8 @@ int BST<ValueType>::getSize() const {
 // we have to choose the greater value of that
 // Complexity: O(n) where n is the total number of elements in the tree
 template <typename ValueType>
-int BST<ValueType>::countChildrenHeight(const BST<ValueType>::Node* current) const {
+int BST<ValueType>::countChildrenHeight(const BST<ValueType>::Node* current) const
+{
     if (current->isLeaf()) {
         return 1;
     }
@@ -154,7 +167,10 @@ int BST<ValueType>::countChildrenHeight(const BST<ValueType>::Node* current) con
 }
 
 template <typename ValueType>
-void BST<ValueType>::postOrderTraversal(BST<ValueType>::Node* current, std::function<void(BST<ValueType>::Node*)> function) {
+void BST<ValueType>::postOrderTraversal(
+    BST<ValueType>::Node* current,
+    std::function<void(BST<ValueType>::Node*)> function)
+{
     if (!current) {
         return;
     }
@@ -168,7 +184,10 @@ void BST<ValueType>::postOrderTraversal(BST<ValueType>::Node* current, std::func
 }
 
 template <typename ValueType>
-void BST<ValueType>::constInOrderTraversal(const BST<ValueType>::Node* current, std::function<void(const BST<ValueType>::Node*)> function) const {
+void BST<ValueType>::constInOrderTraversal(
+    const BST<ValueType>::Node* current,
+    std::function<void(const BST<ValueType>::Node*)> function) const
+{
     if (!current) {
         return;
     }
@@ -184,8 +203,5 @@ void BST<ValueType>::constInOrderTraversal(const BST<ValueType>::Node* current, 
 template <typename ValueType>
 BST<ValueType>::~BST()
 {
-    postOrderTraversal(root_, [](auto current)
-    {
-        delete current;
-    });
+    postOrderTraversal(root_, [](auto current) { delete current; });
 }
