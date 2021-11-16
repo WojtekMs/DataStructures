@@ -31,6 +31,7 @@ class BST
     const Node* root() const;
     int getDepth(const Node* node) const;
     int getHeight() const;
+    int getSize() const;
 };
 
 template <typename ValueType>
@@ -110,6 +111,9 @@ const typename BST<ValueType>::Node* BST<ValueType>::findNode(ValueType val) con
 // In the worst case scenario n = total number of elements (unbalanced tree)
 template <typename ValueType>
 int BST<ValueType>::getDepth(const BST<ValueType>::Node* node) const {
+    if (node == nullptr) {
+        return 0;
+    }
     if (node == root_) {
         return 1;
     }
@@ -118,7 +122,15 @@ int BST<ValueType>::getDepth(const BST<ValueType>::Node* node) const {
 
 template <typename ValueType>
 int BST<ValueType>::getHeight() const {
+    if (!root_) {
+        return 0;
+    }
     return countChildrenHeight(root_);
+}
+
+template <typename ValueType>
+int BST<ValueType>::getSize() const {
+    return size_;
 }
 
 // if we find a leaf, then it is a base case with height 1
@@ -143,6 +155,9 @@ int BST<ValueType>::countChildrenHeight(const BST<ValueType>::Node* current) con
 
 template <typename ValueType>
 void BST<ValueType>::postOrderTraversal(BST<ValueType>::Node* current, std::function<void(BST<ValueType>::Node*)> function) {
+    if (!current) {
+        return;
+    }
     if (current->left_child_) {
         postOrderTraversal(current->left_child_, function);
     }
@@ -154,6 +169,9 @@ void BST<ValueType>::postOrderTraversal(BST<ValueType>::Node* current, std::func
 
 template <typename ValueType>
 void BST<ValueType>::constInOrderTraversal(const BST<ValueType>::Node* current, std::function<void(const BST<ValueType>::Node*)> function) const {
+    if (!current) {
+        return;
+    }
     if (current->left_child_) {
         constInOrderTraversal(current->left_child_, function);
     }
