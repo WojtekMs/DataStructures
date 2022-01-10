@@ -23,7 +23,8 @@ class BST
     int countChildrenHeight(const Node* current) const;
     void postOrderTraversal(Node*, std::function<void(Node*)>);
     void constInOrderTraversal(const Node*, std::function<void(const Node*)>) const;
-    void insert(const ValueType&, Node**);
+    template <typename Value>
+    void insert(Value&&, Node**);
 
    public:
     BST() = default;
@@ -51,7 +52,8 @@ bool BST<ValueType>::Node::isLeaf() const
 }
 
 template <typename ValueType>
-void BST<ValueType>::insert(const ValueType& val, Node** node)
+template <typename Value>
+void BST<ValueType>::insert(Value&& val, Node** node)
 {
     if (!*node) {
         *node = new Node(val);
@@ -59,10 +61,10 @@ void BST<ValueType>::insert(const ValueType& val, Node** node)
         return;
     }
     if (val < (*node)->value_) {
-        insert(val, &((*node)->left_child_));
+        insert(std::forward<Value>(val), &((*node)->left_child_));
     }
     if (val > (*node)->value_) {
-        insert(val, &((*node)->right_child_));
+        insert(std::forward<Value>(val), &((*node)->right_child_));
     }
 }
 
