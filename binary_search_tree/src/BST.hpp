@@ -1,8 +1,9 @@
 #pragma once
 #include "NoElementError.hpp"
-#include <vector>
+
 #include <functional>
 #include <iostream>
+#include <vector>
 
 template <typename ValueType>
 class BST
@@ -22,11 +23,13 @@ class BST
     int countChildrenHeight(const Node* current) const;
     void postOrderTraversal(Node*, std::function<void(Node*)>);
     void constInOrderTraversal(const Node*, std::function<void(const Node*)>) const;
+    void insert(const ValueType&, Node**);
 
    public:
     BST() = default;
     ~BST();
-    void insert(ValueType val);
+    template <typename Value>
+    void insert(Value&& val);
     void printNode(const Node* current) const;
     template <typename Value>
     const Node* findNode(Value&& val) const;
@@ -47,26 +50,28 @@ bool BST<ValueType>::Node::isLeaf() const
     return (!right_child_ && !left_child_);
 }
 
-// Complexity: equal to findParent()
 template <typename ValueType>
-void BST<ValueType>::insert(ValueType val)
+void BST<ValueType>::insert(const ValueType& val, Node** node)
 {
-    if (!root_) {
-        root_ = new Node(val);
+    if (!*node) {
+        *node = new Node(val);
         size_++;
         return;
     }
-    Node* current = findParent(root_, val);
-    if (val > current->value_) {
-        current->right_child_ = new Node(val);
-        current->right_child_->parent_ = current;
-        size_++;
-
-    } else if (val < current->value_) {
-        current->left_child_ = new Node(val);
-        current->left_child_->parent_ = current;
-        size_++;
+    if (val < (*node)->value_) {
+        insert(val, &((*node)->left_child_));
     }
+    if (val > (*node)->value_) {
+        insert(val, &((*node)->right_child_));
+    }
+}
+
+// Complexity: O(logN) where N is the number of elements
+template <typename ValueType>
+template <typename Value>
+void BST<ValueType>::insert(Value&& val)
+{
+    insert(std::forward<Value>(val), &root_);
 }
 
 // returns the parent of the potential node with value "val"
