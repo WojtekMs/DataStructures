@@ -2,8 +2,8 @@
 #include "NoElementError.hpp"
 
 #include <functional>
+#include <memory>
 #include <iostream>
-#include <vector>
 
 template <typename ValueType>
 class BST
@@ -210,5 +210,5 @@ void BST<T>::constInOrderTraversal(
 template <typename T>
 BST<T>::~BST()
 {
-    postOrderTraversal(root_, [](auto current) { delete current; });
+    postOrderTraversal(root_, std::default_delete<BST<T>::Node>{});
 }
