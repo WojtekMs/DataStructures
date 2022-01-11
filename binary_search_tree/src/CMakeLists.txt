@@ -1,6 +1,6 @@
-add_library(BST_lib INTERFACE)
-target_sources(BST_lib PUBLIC BST.hpp NoElementError.hpp)
-target_include_directories(BST_lib INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+add_library(${PROJECT_NAME}_lib INTERFACE)
+target_sources(${PROJECT_NAME}_lib PUBLIC BST.hpp NoElementError.hpp)
+target_include_directories(${PROJECT_NAME}_lib INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(${PROJECT_NAME} main.cpp)
-target_link_libraries(${PROJECT_NAME} BST_lib)
+add_executable(${PROJECT_NAME}_exe main.cpp)
+target_link_libraries(${PROJECT_NAME}_exe ${PROJECT_NAME}_lib)
