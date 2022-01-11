@@ -1,6 +1,13 @@
 # Binary Search Tree
 This is basic implementation of Binary Search Tree. Currently, not all functions are implemented, but project will be (hopefully) further developed in the future. Binary Search Tree is a sorted & hierarchical container, which allows for faster element look and element insertion. However, time complexity of both of the mentioned functions is dependent on the tree balance. It is essential that the tree is well balanced in order to keep the complexity low. There are implementations of self-balancing trees that can do this automatically and they are called 'Red Black Trees' (for example `std::map`). 
 
+Implemented functions:
+- [Tree Height](#tree-height)
+- [Node depth](#node-depth)
+- [Find element](#find-element)
+- [Insert element](#insert-element)
+- [In order traversal](#in-order-traversal)
+- [Post order traversal](#post-order-traversal)
 ## Tree Height
 Tree Height is measured from the lowest node to the heighest node (root). The heighest element in the tree is the root.  
 
@@ -65,7 +72,7 @@ Implementation:
 - if the current node is null then return
 - apply postOrderTraversal to the left child
 - apply postOrderTraversal to the right child
-- apply a function 
+- apply a function  
 **The above sequence will be applied to each child, hence affecting every element of the tree in this precise order**
 
 Time Complexity: O(N) where N is the number of elements
