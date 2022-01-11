@@ -2,8 +2,8 @@
 #include "NoElementError.hpp"
 
 #include <functional>
-#include <memory>
 #include <iostream>
+#include <memory>
 
 template <typename ValueType>
 class BST
@@ -24,21 +24,28 @@ class BST
     int countChildrenHeight(const Node* current) const;
     void postOrderTraversal(Node*, std::function<void(Node*)>);
     void constInOrderTraversal(const Node*, std::function<void(const Node*)>) const;
+    
     template <typename Value>
     void insert(Value&&, Node**);
+
+    template <typename Value>
+    const Node* findNode(Value&&, const Node*) const;
 
    public:
     BST() = default;
     ~BST();
+    
     template <typename Value>
     void insert(Value&& val);
-    void printNode(const Node* current) const;
+    
     template <typename Value>
     const Node* findNode(Value&& val) const;
+
     const Node* root() const;
     int getDepth(const Node* node) const;
     int getHeight() const;
     int getSize() const;
+    void printNode(const Node* current) const;
 };
 
 template <typename T>
@@ -111,16 +118,27 @@ const typename BST<T>::Node* BST<T>::root() const
 
 template <typename T>
 template <typename Value>
+const BST<T>::Node* BST<T>::findNode(Value&& val, const BST<T>::Node* node) const
+{
+    if (!node) {
+        throw NoElementError(val);
+    }
+    auto result = node;
+    if (val > node->value_) {
+        result = findNode(std::forward<Value>(val), node->right_child_);
+    }
+    if (val < node->value_) {
+        result = findNode(std::forward<Value>(val), node->left_child_);
+    }
+    return result;
+}
+
+// Complexity: O(logN) where N is the number of elements
+template <typename T>
+template <typename Value>
 const typename BST<T>::Node* BST<T>::findNode(Value&& val) const
 {
-    if (!root_) {
-        throw NoElementError(std::forward<Value>(val));
-    }
-    auto current = findParent(root_, val);
-    if (current->value_ == val) {
-        return current;
-    }
-    throw NoElementError(std::forward<Value>(val));
+    return findNode(std::forward<Value>(val), root_);
 }
 
 // returns the depth of the chosen node, starting with 1 at the root node

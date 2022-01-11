@@ -87,7 +87,7 @@ class BSTFindNodeTest : public ::testing::TestWithParam<std::pair<std::vector<in
     BST<int> bst;
 };
 
-TEST_P(BSTFindNodeTest, TestingGetDepthWithMultipleValues)
+TEST_P(BSTFindNodeTest, TestingFindNodeWithMultipleValues)
 {
     const auto& [values, valueToBeFound] = GetParam();
     for (const int val : values) {
