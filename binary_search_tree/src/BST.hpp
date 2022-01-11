@@ -20,7 +20,6 @@ class BST
     Node* root_{};
     int size_{};
 
-    Node* findParent(Node* current, ValueType val) const;
     void postOrderTraversal(Node*, std::function<void(Node*)>);
     void constInOrderTraversal(const Node*, std::function<void(const Node*)>) const;
     int countHeight(const Node*) const;
@@ -83,23 +82,6 @@ template <typename Value>
 void BST<T>::insert(Value&& val)
 {
     insert(std::forward<Value>(val), &root_);
-}
-
-// returns the parent of the potential node with value "val"
-// if there is already element with value "val" return the pointer to this element
-// Complexity: O(h) where h is the height of the tree
-// (which means O(logn) on average where n is the total number of elements in the tree)
-// Worst case scenario: O(n) where n is the total number of elements in the tree
-template <typename T>
-typename BST<T>::Node* BST<T>::findParent(Node* current, T val) const
-{
-    if (current->left_child_ && val < current->value_) {
-        current = findParent(current->left_child_, val);
-    }
-    if (current->right_child_ && val > current->value_) {
-        current = findParent(current->right_child_, val);
-    }
-    return current;
 }
 
 // Complexity O(n) where n is the total number of elements in the tree
@@ -189,12 +171,8 @@ void BST<T>::postOrderTraversal(BST<T>::Node* current,
     if (!current) {
         return;
     }
-    if (current->left_child_) {
-        postOrderTraversal(current->left_child_, function);
-    }
-    if (current->right_child_) {
-        postOrderTraversal(current->right_child_, function);
-    }
+    postOrderTraversal(current->left_child_, function);
+    postOrderTraversal(current->right_child_, function);
     function(current);
 }
 
@@ -206,13 +184,9 @@ void BST<T>::constInOrderTraversal(
     if (!current) {
         return;
     }
-    if (current->left_child_) {
-        constInOrderTraversal(current->left_child_, function);
-    }
+    constInOrderTraversal(current->left_child_, function);
     function(current);
-    if (current->right_child_) {
-        constInOrderTraversal(current->right_child_, function);
-    }
+    constInOrderTraversal(current->right_child_, function);
 }
 
 template <typename T>
