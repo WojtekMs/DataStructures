@@ -21,9 +21,9 @@ class BST
     int size_{};
 
     Node* findParent(Node* current, ValueType val) const;
-    int countChildrenHeight(const Node* current) const;
     void postOrderTraversal(Node*, std::function<void(Node*)>);
     void constInOrderTraversal(const Node*, std::function<void(const Node*)>) const;
+    int countHeight(const Node*) const;
     
     template <typename Value>
     void insert(Value&&, Node**);
@@ -43,7 +43,7 @@ class BST
 
     const Node* root() const;
     int getDepth(const Node* node) const;
-    int getHeight() const;
+    int countHeight() const;
     int getSize() const;
     void printNode(const Node* current) const;
 };
@@ -157,12 +157,9 @@ int BST<T>::getDepth(const BST<T>::Node* node) const
 }
 
 template <typename T>
-int BST<T>::getHeight() const
+int BST<T>::countHeight() const
 {
-    if (!root_) {
-        return 0;
-    }
-    return countChildrenHeight(root_);
+    return countHeight(root_);
 }
 
 template <typename T>
@@ -171,25 +168,18 @@ int BST<T>::getSize() const
     return size_;
 }
 
-// if we find a leaf, then it is a base case with height 1
-// if a node has children, it's height is 1 + count of left or right child's children
-// we have to choose the greater value of that
+
 // Complexity: O(n) where n is the total number of elements in the tree
 template <typename T>
-int BST<T>::countChildrenHeight(const BST<T>::Node* current) const
+int BST<T>::countHeight(const BST<T>::Node* current) const
 {
+    if (!current) {
+        return 0;
+    }
     if (current->isLeaf()) {
         return 1;
     }
-    int leftChildrenHeight = 0;
-    int rightChildrenHeight = 0;
-    if (current->left_child_) {
-        leftChildrenHeight = 1 + countChildrenHeight(current->left_child_);
-    }
-    if (current->right_child_) {
-        rightChildrenHeight = 1 + countChildrenHeight(current->right_child_);
-    }
-    return std::max(rightChildrenHeight, leftChildrenHeight);
+    return 1 + std::max(countHeight(current->left_child_), countHeight(current->right_child_));
 }
 
 template <typename T>
