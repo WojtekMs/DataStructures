@@ -10,7 +10,7 @@ int main() {
     tree.insert(13);
     tree.insert(9);
 
-    std::cout << tree.getHeight() << '\n';
+    std::cout << tree.countHeight() << '\n';
     std::cout << tree.getDepth(tree.findNode(9)) << '\n';
 
     

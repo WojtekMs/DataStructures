@@ -20,7 +20,7 @@ TEST_F(BSTTest, WhenBSTCreated_ThenSizeShouldBe0)
 
 TEST_F(BSTTest, WhenBSTCreated_ThenGetHeightShouldBe0)
 {
-    ASSERT_EQ(bst.getHeight(), 0);
+    ASSERT_EQ(bst.countHeight(), 0);
 }
 
 TEST_F(BSTTest, WhenBSTCreated_ThenGetDepthShouldBe0)
@@ -71,7 +71,7 @@ TEST_P(BSTHeightTest, TestingGetHeightWithMultipleValues)
         bst.insert(val);
     }
 
-    ASSERT_EQ(bst.getHeight(), expectedHeight);
+    ASSERT_EQ(bst.countHeight(), expectedHeight);
 }
 
 INSTANTIATE_TEST_CASE_P(BSTHeightTests,
@@ -87,7 +87,7 @@ class BSTFindNodeTest : public ::testing::TestWithParam<std::pair<std::vector<in
     BST<int> bst;
 };
 
-TEST_P(BSTFindNodeTest, TestingGetDepthWithMultipleValues)
+TEST_P(BSTFindNodeTest, TestingFindNodeWithMultipleValues)
 {
     const auto& [values, valueToBeFound] = GetParam();
     for (const int val : values) {

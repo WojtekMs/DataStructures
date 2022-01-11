@@ -2,8 +2,8 @@
 #include "NoElementError.hpp"
 
 #include <functional>
-#include <memory>
 #include <iostream>
+#include <memory>
 
 template <typename ValueType>
 class BST
@@ -20,25 +20,31 @@ class BST
     Node* root_{};
     int size_{};
 
-    Node* findParent(Node* current, ValueType val) const;
-    int countChildrenHeight(const Node* current) const;
     void postOrderTraversal(Node*, std::function<void(Node*)>);
     void constInOrderTraversal(const Node*, std::function<void(const Node*)>) const;
+    int countHeight(const Node*) const;
+    
     template <typename Value>
     void insert(Value&&, Node**);
+
+    template <typename Value>
+    const Node* findNode(Value&&, const Node*) const;
 
    public:
     BST() = default;
     ~BST();
+    
     template <typename Value>
     void insert(Value&& val);
-    void printNode(const Node* current) const;
+    
     template <typename Value>
     const Node* findNode(Value&& val) const;
+
     const Node* root() const;
     int getDepth(const Node* node) const;
-    int getHeight() const;
+    int countHeight() const;
     int getSize() const;
+    void printNode(const Node* current) const;
 };
 
 template <typename T>
@@ -78,23 +84,6 @@ void BST<T>::insert(Value&& val)
     insert(std::forward<Value>(val), &root_);
 }
 
-// returns the parent of the potential node with value "val"
-// if there is already element with value "val" return the pointer to this element
-// Complexity: O(h) where h is the height of the tree
-// (which means O(logn) on average where n is the total number of elements in the tree)
-// Worst case scenario: O(n) where n is the total number of elements in the tree
-template <typename T>
-typename BST<T>::Node* BST<T>::findParent(Node* current, T val) const
-{
-    if (current->left_child_ && val < current->value_) {
-        current = findParent(current->left_child_, val);
-    }
-    if (current->right_child_ && val > current->value_) {
-        current = findParent(current->right_child_, val);
-    }
-    return current;
-}
-
 // Complexity O(n) where n is the total number of elements in the tree
 template <typename T>
 void BST<T>::printNode(const BST<T>::Node* current) const
@@ -111,16 +100,27 @@ const typename BST<T>::Node* BST<T>::root() const
 
 template <typename T>
 template <typename Value>
+const BST<T>::Node* BST<T>::findNode(Value&& val, const BST<T>::Node* node) const
+{
+    if (!node) {
+        throw NoElementError(val);
+    }
+    auto result = node;
+    if (val > node->value_) {
+        result = findNode(std::forward<Value>(val), node->right_child_);
+    }
+    if (val < node->value_) {
+        result = findNode(std::forward<Value>(val), node->left_child_);
+    }
+    return result;
+}
+
+// Complexity: O(logN) where N is the number of elements
+template <typename T>
+template <typename Value>
 const typename BST<T>::Node* BST<T>::findNode(Value&& val) const
 {
-    if (!root_) {
-        throw NoElementError(std::forward<Value>(val));
-    }
-    auto current = findParent(root_, val);
-    if (current->value_ == val) {
-        return current;
-    }
-    throw NoElementError(std::forward<Value>(val));
+    return findNode(std::forward<Value>(val), root_);
 }
 
 // returns the depth of the chosen node, starting with 1 at the root node
@@ -139,12 +139,9 @@ int BST<T>::getDepth(const BST<T>::Node* node) const
 }
 
 template <typename T>
-int BST<T>::getHeight() const
+int BST<T>::countHeight() const
 {
-    if (!root_) {
-        return 0;
-    }
-    return countChildrenHeight(root_);
+    return countHeight(root_);
 }
 
 template <typename T>
@@ -153,25 +150,18 @@ int BST<T>::getSize() const
     return size_;
 }
 
-// if we find a leaf, then it is a base case with height 1
-// if a node has children, it's height is 1 + count of left or right child's children
-// we have to choose the greater value of that
+
 // Complexity: O(n) where n is the total number of elements in the tree
 template <typename T>
-int BST<T>::countChildrenHeight(const BST<T>::Node* current) const
+int BST<T>::countHeight(const BST<T>::Node* current) const
 {
+    if (!current) {
+        return 0;
+    }
     if (current->isLeaf()) {
         return 1;
     }
-    int leftChildrenHeight = 0;
-    int rightChildrenHeight = 0;
-    if (current->left_child_) {
-        leftChildrenHeight = 1 + countChildrenHeight(current->left_child_);
-    }
-    if (current->right_child_) {
-        rightChildrenHeight = 1 + countChildrenHeight(current->right_child_);
-    }
-    return std::max(rightChildrenHeight, leftChildrenHeight);
+    return 1 + std::max(countHeight(current->left_child_), countHeight(current->right_child_));
 }
 
 template <typename T>
@@ -181,12 +171,8 @@ void BST<T>::postOrderTraversal(BST<T>::Node* current,
     if (!current) {
         return;
     }
-    if (current->left_child_) {
-        postOrderTraversal(current->left_child_, function);
-    }
-    if (current->right_child_) {
-        postOrderTraversal(current->right_child_, function);
-    }
+    postOrderTraversal(current->left_child_, function);
+    postOrderTraversal(current->right_child_, function);
     function(current);
 }
 
@@ -198,13 +184,9 @@ void BST<T>::constInOrderTraversal(
     if (!current) {
         return;
     }
-    if (current->left_child_) {
-        constInOrderTraversal(current->left_child_, function);
-    }
+    constInOrderTraversal(current->left_child_, function);
     function(current);
-    if (current->right_child_) {
-        constInOrderTraversal(current->right_child_, function);
-    }
+    constInOrderTraversal(current->right_child_, function);
 }
 
 template <typename T>
