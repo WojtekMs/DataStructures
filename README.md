@@ -15,3 +15,5 @@ In order to run Binary Search Tree examples run:
 - `cd build`
 - `make BST` (launches example)
 - `make BST_test` (launches example tests)
+
+[BST docs](binary_search_tree/README.md)
