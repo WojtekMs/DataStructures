@@ -55,6 +55,18 @@ TEST_F(ForwardListTest,
     EXPECT_EQ(getVector(listSUT), values);
 }
 
+TEST_F(ForwardListTest,
+       GivenListOfValues_WhenCopied_ThenCopyContainsTheSameValuesButDifferentAddresses)
+{
+    const std::vector<int> values{178, 200, 6798, -2100, 0, 231311};
+    for (auto val : values) {
+        listSUT.insert(val);
+    }
+    ForwardList<int> copy = listSUT;
+    EXPECT_EQ(getVector(copy), values);
+    EXPECT_NE(listSUT.head(), copy.head());
+}
+
 class ForwardListReverseTest :
   public ::testing::TestWithParam<std::pair<std::vector<int>, std::vector<int>>>
 {

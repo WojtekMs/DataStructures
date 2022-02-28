@@ -12,11 +12,16 @@ class ForwardList
     };
 
    public:
+    ForwardList() = default;
+    ForwardList(const ForwardList& rhs);
+    ForwardList(ForwardList&& rhs) = delete;
+    ForwardList& operator=(const ForwardList& rhs) = delete;
+    ForwardList& operator=(ForwardList&& rhs) = delete;
+    ~ForwardList();
+
     void insert(const T& value);
     void reverse();
     void print();
-
-    ~ForwardList();
 
     [[nodiscard]] const Node* head() const;
     [[nodiscard]] int size() const;
@@ -29,11 +34,29 @@ class ForwardList
 };
 
 template <typename T>
-ForwardList<T>::Node::Node(const T& value) : value_(value) {}
+ForwardList<T>::Node::Node(const T& value) : value_(value)
+{
+}
 
 template <typename T>
-ForwardList<T>::~ForwardList() {
-    while(head_) {
+ForwardList<T>::ForwardList(const ForwardList& rhs) : size_(rhs.size_)
+{
+    if (!head_ && rhs.head_) {
+        head_ = new Node(rhs.head_->value_);
+    }
+    const auto* rhsCurrent = rhs.head_->next_;
+    auto* lhsCurrent = head_;
+    while (rhsCurrent) {
+        lhsCurrent->next_ = new Node(rhsCurrent->value_);
+        lhsCurrent = lhsCurrent->next_;
+        rhsCurrent = rhsCurrent->next_;
+    }
+}
+
+template <typename T>
+ForwardList<T>::~ForwardList()
+{
+    while (head_) {
         auto* copy = head_;
         head_ = head_->next_;
         delete copy;
@@ -95,6 +118,7 @@ const typename ForwardList<T>::Node* ForwardList<T>::head() const
 }
 
 template <typename T>
-int ForwardList<T>::size() const {
+int ForwardList<T>::size() const
+{
     return size_;
 }
