@@ -11,3 +11,4 @@ set_default_build_type()
 
 enable_testing()
 add_subdirectory(binary_search_tree EXCLUDE_FROM_ALL)
+add_subdirectory(forward_list EXCLUDE_FROM_ALL)
