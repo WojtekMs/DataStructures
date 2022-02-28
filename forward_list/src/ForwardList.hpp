@@ -16,7 +16,10 @@ class ForwardList
     void reverse();
     void print();
 
-    const Node* head() const;
+    ~ForwardList();
+
+    [[nodiscard]] const Node* head() const;
+    [[nodiscard]] int size() const;
 
    private:
     void reverse(Node*& first, Node* last, int current);
@@ -27,6 +30,15 @@ class ForwardList
 
 template <typename T>
 ForwardList<T>::Node::Node(const T& value) : value_(value) {}
+
+template <typename T>
+ForwardList<T>::~ForwardList() {
+    while(head_) {
+        auto* copy = head_;
+        head_ = head_->next_;
+        delete copy;
+    }
+}
 
 template <typename T>
 void ForwardList<T>::insert(const T& value)
@@ -80,4 +92,9 @@ template <typename T>
 const typename ForwardList<T>::Node* ForwardList<T>::head() const
 {
     return head_;
+}
+
+template <typename T>
+int ForwardList<T>::size() const {
+    return size_;
 }
